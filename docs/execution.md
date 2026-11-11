@@ -1,12 +1,12 @@
 # LedgerSentinel Implementation Plan
 
-> **For agentic workers:** When implementation is explicitly authorized, use `superpowers:executing-plans` for task-by-task work, or `superpowers:subagent-driven-development` only if that execution method is selected. Tasks use unchecked checkboxes; no task below has been implemented or verified.
+> **For agentic workers:** When implementation is explicitly authorized, use `superpowers:executing-plans` for task-by-task work, or `superpowers:subagent-driven-development` only if that execution method is selected. Checkboxes and task evidence below record actual progress. Current authorization covers SETUP-01.1 only; stop after its verification and diff review.
 
 **Goal:** Deliver the local, synthetic-data LedgerSentinel portfolio MVP without expanding its financial or security scope.  
 **Architecture:** One Next.js app consumes allowlisted NestJS HTTP endpoints. A NestJS modular monolith owns PostgreSQL through repositories; Redis/BullMQ delivers work recoverable from a durable PostgreSQL inbox. Financial writes and reconciliation actions preserve exact money, immutable history, and transactional consistency.  
 **Tech stack:** TypeScript, NestJS, PostgreSQL, Drizzle, Redis/BullMQ, Next.js, shared Zod contracts, shadcn UI, TanStack Query, React Hook Form, Jest, Vitest, and Playwright.  
 **Spec:** [product.md](product.md) and [architecture.md](architecture.md). Read both before executing any task.  
-**Status:** Planning draft for review, 2026-11-11. This file is not permission to develop, install dependencies, start infrastructure, execute migrations, or deploy. The existing product and architecture approval statuses are unchanged.
+**Status:** SETUP-01.1 explicitly authorized and verified on 2026-11-11. Remaining tasks await authorization. Infrastructure startup, migration execution, and deployment remain unapproved; product/schema approval is not inferred from this tooling task.
 
 ## 1. Baseline, corrections, and execution gates
 
@@ -46,7 +46,7 @@ The attached task-template request guides the slicing format. Where its examples
 - Root workspace installation uses the proposed pnpm exception; backend scripts use `npm --prefix apps/api run ...`. Do not produce a second npm lockfile. This remains gated by A.
 - Estimate **15–20 minutes per task as a planning target**, not a guarantee. If the failing test plus deliverable cannot fit one focused session, split it into named child tasks here before implementation. Never declare a stub or skipped test a completed slice just to meet the estimate.
 - For behavior: write the named failing tests, confirm the expected failure, implement the smallest complete interface/export, then run the stated command. For configuration, validate the real configuration/build rather than adding tests that merely echo its text.
-- Each task ends with its verification command, recorded result, diff review, and a focused commit only when commits are authorized. Do not stage unrelated toolkit files. This folder currently has no application or established Git history to assume.
+- Each task ends with its verification command, recorded result, diff review, and a focused commit only when commits are authorized. Do not stage unrelated toolkit files. Git was initialized with documentation baseline `8da956a`; `development` is the integration branch and task branches start from it.
 
 ### 2.1 Command and test conventions
 
@@ -109,10 +109,12 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 ## 5. SETUP — Workspace, infrastructure definition, contracts, gateway
 
 ### SETUP-01.1 — Record toolchain and workspace configuration
-- [ ] **Goal / dependency:** After A/B, establish actual package boundaries and an exact compatible version matrix; do not copy unsupported sample versions blindly.
+- [x] **Goal / dependency:** After A/B, establish actual package boundaries and an exact compatible version matrix; do not copy unsupported sample versions blindly.
 - **Files:** Root `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, `.gitignore`; `docs/toolchain.md`; `tools/verification/workspace.test.mjs`.
 - **Deliverable:** Reserve package locations/names `@project/api`, `@project/web`, `@project/contracts`, `@project/ui`; manifests arrive in the following owning setup tasks. Declare workspace member patterns, dependency-direction policy and task graph; check Node/pnpm and document versions. No secret values or application behavior.
 - **Verification:** `node --test tools/verification/workspace.test.mjs` — succeeds with valid declared member patterns, pinned package manager and build task graph; it does not falsely require later package manifests to exist yet. Revalidate actual package links in SETUP-03.2.
+- **Evidence (2026-11-11):** User explicitly approved this task. Branch `chore/setup-01-1-workspace`, based on `development` at `8da956a`; changes remain uncommitted for review. Added the listed configuration, toolchain document, and six verification tests; generated `pnpm-lock.yaml` using root `pnpm install` (exit 0). Installed Node 24.10.0, pnpm 10.24.0, Turbo 2.11.10, TypeScript 5.9.3, and YAML 2.9.1. Initial test run failed 6/6 because configuration/tool dependencies did not exist; after implementation the exact verification command exited 0: 6 tests passed, 0 failed, 0 skipped. Checks cover real Turbo configuration and TypeScript compiler behavior, not application readiness. Package manifests and consumer compatibility remain owned by later tasks.
+- **Scope ruling:** This approval selects the plan's pnpm root-install exception with npm backend script invocation for this task. Later stack version checks, disposable service approval, schema/migration gates, commits, and pushes are not inferred. Next task is SETUP-01.2, but do not start it without authorization.
 
 ### SETUP-01.2 — Create the API compilation and Jest harness
 - [ ] **Goal / dependency:** SETUP-01.1; make backend checks real before feature work.
@@ -527,8 +529,8 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 
 ## 14. Tracking, handoff, and next authorized action
 
-All checkboxes begin unchecked. Completing a task requires naming the actual files/revision, command, observed exit/result, relevant limitations, and next task. A documentation review is not a database-verification pass. A skipped service-dependent suite is not a successful module gate.
+Completing a task requires naming the actual files/revision, command, observed exit/result, relevant limitations, and next task. A documentation review is not a database-verification pass. A skipped service-dependent suite is not a successful module gate.
 
-**Current state:** Only planning documents exist. No application harness, scripts, schemas, containers, or tests described here have been implemented by this request. Read-only planning inspection and Markdown coverage checks do not change that status.
+**Current state:** SETUP-01.1 workspace tooling and verification are implemented, with evidence above. No API/frontend harness, application behavior, schemas, or containers have been implemented. All other task checkboxes remain unchecked.
 
-**Next action:** Review this task plan and the baseline decisions. If approved, explicitly choose when implementation may begin; the first implementation task is SETUP-01.1 after gates A/B. No execution method or deployment permission is inferred from accepting a planning document.
+**Next action:** Stop for review of SETUP-01.1. SETUP-01.2 is next in order and remains unauthorized. No commit, merge, push, infrastructure startup, migration execution, or deployment follows automatically.
