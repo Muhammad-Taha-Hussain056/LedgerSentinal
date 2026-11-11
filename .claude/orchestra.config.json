@@ -1,0 +1,81 @@
+{
+  "$comment": "Project-specific values. The ONLY file you edit per project. Skills, agents, commands and hooks read from here.",
+  "scope": "@project",
+  "packageManager": "npm",
+  "frontendPackageManager": "pnpm",
+  "stack": {
+    "framework": "nestjs",
+    "language": "typescript",
+    "orm": "drizzle",
+    "ormOptions": ["drizzle", "mongoose", "prisma", "typeorm"],
+    "database": "postgres",
+    "databaseOptions": ["postgres", "mongodb", "mysql"],
+    "transport": "http",
+    "queueDriver": "none",
+    "cacheDriver": "none",
+    "authStrategy": "jwt"
+  },
+  "apps": {
+    "api": {
+      "path": "apps/api",
+      "framework": "nestjs",
+      "srcDir": "src",
+      "port": 3001
+    },
+    "web": {
+      "path": "apps/web",
+      "framework": "next",
+      "srcDir": "src",
+      "port": 3000
+    }
+  },
+  "packages": {
+    "ui": "packages/ui",
+    "contracts": "packages/contracts",
+    "utils": "packages/utils"
+  },
+  "frontend": {
+    "repo": "monorepo-or-separate",
+    "baseUrl": "http://localhost:3000",
+    "authCookies": {
+      "access": "access_token",
+      "refresh": "refresh_token"
+    },
+    "authPaths": {
+      "login": "/auth/login",
+      "refresh": "/auth/refresh",
+      "logout": "/auth/logout",
+      "me": "/auth/me"
+    }
+  },
+  "database": {
+    "migrationsDir": "drizzle",
+    "schemaDir": "src/database/schema",
+    "repositoriesDir": "src/database/repositories",
+    "seedDir": "src/database/seeds"
+  },
+  "toggles": {
+    "cqrs": false,
+    "multiTenant": false,
+    "microservices": false,
+    "eventEmitter": true,
+    "swagger": true,
+    "throttle": true,
+    "i18n": false,
+    "pwa": false,
+    "realtime": "none"
+  },
+  "conventions": {
+    "moduleStyle": "feature-first",
+    "repositoryToken": "symbol",
+    "dtoValidation": "class-validator",
+    "errorFormat": "rfc9457"
+  },
+  "contracts": {
+    "mode": "lean-shared",
+    "sourceOfTruth": "packages/contracts",
+    "consumption": "workspace-or-registry",
+    "skipIfSimple": true
+  },
+  "pinnedVersionsNote": "Versions are read from package.json at session start. Never assume a version; verify version-specific APIs against that version's docs."
+}
