@@ -31,3 +31,4 @@ Thumbs.db
 .pnpm-cache/
 .pnpm-state/
 next-env.d.ts
+.contract-build/

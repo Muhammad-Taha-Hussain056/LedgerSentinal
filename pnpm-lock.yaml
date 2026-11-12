@@ -44,6 +44,9 @@ importers:
       '@nestjs/core':
         specifier: 11.2.9
         version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@project/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -81,6 +84,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@project/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@project/ui':
         specifier: workspace:*
         version: link:../../packages/ui

@@ -184,6 +184,26 @@ tests enforce the public root boundary. No application dependencies or root path
 aliases bypass package exports. API/Next production consumption belongs to SETUP-03.2.
 See [the package contract](../packages/contracts/README.md) for serialization rulings.
 
+## Domain contracts and application consumption (SETUP-03.2)
+
+API and web now declare real `workspace:*` dependencies on `@project/contracts`.
+Build the compiled contracts package before direct application builds; root Turbo
+also follows the declared dependency graph. No new library versions were introduced.
+
+The API build uses a separate NodeNext `.cts` fixture to compile and execute the
+CommonJS export by package name; its generated `.contract-build` directory is
+ignored and is not production source. The web build runs the actual operator app
+build and a separate Next fixture that parses a real synthetic domain payload
+during prerender. A generated-HTML assertion confirms execution. Fixture sources
+are excluded from the operator app's TypeScript project and routes; the compiled
+package is not bypassed through TypeScript aliases or `transpilePackages`.
+
+Executed evidence: 53 domain tests, 126 total contracts tests, 3 compiled-export
+tests, contracts typecheck/build/lint, both required application builds including
+consumer gates, API/web regression/typecheck/lint, and the workspace gate. No
+HTTP behavior, financial operation, database connection or infrastructure startup
+is implied by this transport/build verification.
+
 References: [Turborepo configuration](https://turborepo.com/docs/reference/configuration),
 [pnpm package metadata](https://pnpm.io/package_json),
 [TypeScript strict checking](https://www.typescriptlang.org/tsconfig/strict.html).

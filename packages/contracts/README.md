@@ -1,8 +1,9 @@
-# Common transport contracts
+# Shared transport contracts
 
-Private workspace package for SETUP-03.1. Its only runtime dependency is Zod.
+Private workspace package for SETUP-03.1/03.2. Its only runtime dependency is Zod.
 No application, React, NestJS, database or Node-only runtime imports belong here.
-Domain transports and API/web dependency wiring remain SETUP-03.2.
+Common and domain transports are implemented; API/web consume the compiled package
+through real workspace dependencies. No endpoint behavior is implemented here.
 
 ## Money
 
@@ -66,4 +67,52 @@ The build emits ESM/CJS and matching declarations, with Zod external. Conditiona
 exports expose only the public root; private source subpaths are blocked. Export
 verification compiles `.mts` and `.cts` consumer fixtures and loads the real package
 name through both Node module systems. Actual API and Next production-consumer
-integration remains the next task. No registry publication occurs.
+integration is verified by the isolated fixtures described below. No registry publication occurs.
+
+## Domain transports
+
+- `ledger.ts`: fixed account/journal enums, bounded queries, UUID parameters, account
+  balances, journal summaries/details, exactly two nonzero posting records, strict
+  reversal reason input, reversal result and named response envelopes.
+- `ingestion.ts`: bounded queries and safe processing projections, strict empty retry
+  input, minimal health response, simulator events and a settled-specific schema.
+  Settled events require positive exact USD money and a UTC instant. Pending/failed
+  and unknown nonblank event types may omit settlement fields; supplied fields still
+  validate. Use the settled-specific schema/type when code requires all financial fields.
+- `reconciliation.ts`: invoice inputs/views, import envelope/results, candidate
+  evidence, approval/history shapes and named responses. Dates are real calendar
+  dates; timestamps are UTC ISO strings. Input references may be absent or blank
+  (normalized to undefined); response references use explicit null. Identity case
+  is preserved. Actor output fields are bounded strings, not resource UUIDs.
+
+The invoice envelope validates only its strict outer shape and 1–100 raw rows.
+Validate each row independently with `invoiceInputSchema`; never cast the entire
+batch to valid invoices or reject valid siblings because another row is malformed.
+Results retain 1-based input order and checked created/duplicate/conflict/invalid
+counts. The raw 256-KiB limit belongs to the later HTTP byte boundary.
+
+Schemas reject unknown fields at the correct body/query/row boundaries. Bodies
+cannot supply server-owned actor/status/allocation fields. Response validation is
+not proof of balanced persistence, authorization, eligibility, allocation,
+transaction consistency, safe disclosure of explanation text, or processing effects.
+Those responsibilities remain with their owning application/database tasks.
+
+## Application build consumers
+
+Build contracts before direct API/web builds; Turbo's declared dependencies also
+establish that order. Both apps depend on `@project/contracts: workspace:*`; there
+are no source-path aliases or contracts dependency in the UI package.
+
+```powershell
+pnpm --filter @project/contracts exec vitest run src/domain.test.ts
+pnpm --filter @project/contracts run build
+npm.cmd --prefix apps/api run build
+pnpm --filter @project/web run build
+```
+
+The API build compiles and executes a test-only `.cts` consumer in ignored
+`.contract-build` output; production `dist` still contains only application source.
+The web build also builds a separate Next fixture, executes domain parsing during
+prerender and checks its generated HTML. The operator route is unchanged. These
+gates exercise real package-name/conditional-export resolution, types and runtime
+consumption, without adding fake data or validation calls to application screens.
