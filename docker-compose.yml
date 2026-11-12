@@ -1,0 +1,39 @@
+name: ledgersentinel-test
+
+services:
+  postgres:
+    image: postgres:16.15-alpine3.24@sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139
+    restart: 'no'
+    environment:
+      POSTGRES_DB: ledgersentinel_test
+      POSTGRES_USER: ledger_test
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:?Set a disposable local test password before starting services}'
+    ports:
+      - '127.0.0.1:55432:5432'
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7.2.17-alpine3.22@sha256:ea0b4a0bac3988a3129908075d6219d78cc7b2a0a4b643b14ce857333026177a
+    restart: 'no'
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '127.0.0.1:56379:6379'
+    volumes:
+      - redis_test_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_test_data: {}
+  redis_test_data: {}

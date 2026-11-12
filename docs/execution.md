@@ -6,7 +6,7 @@
 **Architecture:** One Next.js app consumes allowlisted NestJS HTTP endpoints. A NestJS modular monolith owns PostgreSQL through repositories; Redis/BullMQ delivers work recoverable from a durable PostgreSQL inbox. Financial writes and reconciliation actions preserve exact money, immutable history, and transactional consistency.  
 **Tech stack:** TypeScript, NestJS, PostgreSQL, Drizzle, Redis/BullMQ, Next.js, shared Zod contracts, shadcn UI, TanStack Query, React Hook Form, Jest, Vitest, and Playwright.  
 **Spec:** [product.md](product.md) and [architecture.md](architecture.md). Read both before executing any task.  
-**Status:** SETUP-01.1 through SETUP-01.3 verified; SETUP-02 authorized next. Evidence updated 2026-11-12. Infrastructure startup, migration execution, and deployment remain unapproved; product/schema approval is not inferred from these harness/configuration tasks.
+**Status:** SETUP-01.1 through SETUP-01.3 and SETUP-02 implemented and verified. Evidence updated 2026-11-12. Stop before SETUP-03. Infrastructure startup, migration execution, and deployment remain unapproved; product/schema approval is not inferred from these harness/configuration tasks.
 
 ## 1. Baseline, corrections, and execution gates
 
@@ -121,7 +121,7 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 - **Files:** `apps/api/package.json`, `tsconfig.json`, `tsconfig.build.json`, `nest-cli.json`, `jest.config.cjs`, `eslint.config.mjs`, `src/app.module.ts`, `test/harness.spec.ts`.
 - **Deliverable:** Strict Nest compilation; declared build/typecheck/lint/test scripts; unit and integration spec discovery; a real module-container smoke test. No feature placeholders counted as completed behavior.
 - **Verification:** `npm --prefix apps/api run test -- --runInBand --runTestsByPath test/harness.spec.ts` — module boot succeeds; also `npm --prefix apps/api run typecheck`.
-- **Evidence (2026-11-12):** `chore/setup-01-harnesses` from development `2043b44`. RED failed with TS2307 for absent AppModule; GREEN initialized/resolved/closed the real Nest container, 1/1 test passed. API typecheck, production compilation, ESLint and full Jest discovery all exited 0; exact harness command rechecked after the final dependency install, 1/1 passed. Windows execution used `npm.cmd` to preserve the `--` separator. Backend architect/reviewer found no blockers; an explicit nonexistent-test probe exited 1. Build emits AppModule and its map only, excluding tests. No HTTP listener, application services, contracts, persistence or security behavior was added. `build`/`dev` use the installed TypeScript compiler; Nest CLI metadata is reserved for the later bootstrap.
+- **Evidence (2026-11-12):** `chore/setup-01-harnesses` from development `2043b44`; committed with SETUP-01.3 as `3df9279`, merged into development at `9c5d2d0`, and pushed. RED failed with TS2307 for absent AppModule; GREEN initialized/resolved/closed the real Nest container, 1/1 test passed. API typecheck, production compilation, ESLint and full Jest discovery all exited 0; exact harness command rechecked after the final dependency install, 1/1 passed. Windows execution used `npm.cmd` to preserve the `--` separator. Backend architect/reviewer found no blockers; an explicit nonexistent-test probe exited 1. Build emits AppModule and its map only, excluding tests. No HTTP listener, application services, contracts, persistence or security behavior was added. `build`/`dev` use the installed TypeScript compiler; Nest CLI metadata is reserved for the later bootstrap.
 
 ### SETUP-01.3 — Create frontend and browser-test harnesses
 - [x] **Goal / dependency:** SETUP-01.1; provide one compilable Next app and reusable UI package.
@@ -132,10 +132,12 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 - **Environment ruling:** Root `.npmrc` places this repository's npm/pnpm caches on D after C-drive ENOSPC interrupted installation. Task processes also use `.superpowers/tmp` on D. Root install completed successfully with the pinned versions. Latest MSW's transitive CLI dependency required a newer Node patch, so MSW 2.12.3 was selected for Node 24.10 compatibility; engine checks remain enabled. No unrelated user cache was deleted.
 
 ### SETUP-02 — Define the disposable local service environment
-- [ ] **Goal / dependency:** SETUP-01.1 and B; define PostgreSQL/Redis services without starting them in this planning phase.
+- [x] **Goal / dependency:** SETUP-01.1 and B; define PostgreSQL/Redis services without starting them in this planning phase.
 - **Files:** `docker-compose.yml`, `.env.example`, `tools/verification/compose.test.mjs`.
 - **Deliverable:** Proposed PostgreSQL 16/Redis 7.2 targets pinned to checked patch/digests; health checks, test-only database naming, loopback ports and isolated volumes; documented variable names without usable credentials. No app containers yet.
 - **Verification:** `docker compose config --quiet` and `node --test tools/verification/compose.test.mjs` — valid configuration, bounded exposure, distinct test data location. Future startup requires explicit execution/environment authorization.
+- **Evidence (2026-11-12):** Branch `chore/setup-02-local-services` was created from latest development `9c5d2d0` after the Setup 1 merge/push. Official PostgreSQL 16.15/Alpine 3.24 and Redis 7.2.17/Alpine 3.22 manifest-index digests were reverified against Docker's registry, including linux/amd64 and linux/arm64. RED policy suite failed 6/6 before the configuration existed; GREEN passed 6/6 with 0 skipped. Docker Compose v2.32.4 accepted `docker compose config --quiet` (exit 0), with `.env.example` selected and a process-only nonsecret validation marker. Tests parse both source YAML and normalized real Compose output, assert loopback ports/owned test volumes/health probes, reject missing or empty password, and check empty environment-variable examples. Bounded architecture/review found no blockers. No image pulls, container startup, database connection, schema or migration execution occurred.
+- **Limits:** This is configuration verification, not database/queue runtime readiness. The initialization account is a disposable test superuser; later runtime access requires a separate restricted role. Fixed project names identify one owned test stack; concurrent disposable runs need separately owned project namespaces in their future harness. Never delete/reset shared resources automatically.
 
 ### SETUP-03.1 — Publish exact-money and common transport contracts
 - [ ] **Goal / dependency:** SETUP-01.1; establish serialization and public contract exports.
@@ -534,6 +536,6 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 
 Completing a task requires naming the actual files/revision, command, observed exit/result, relevant limitations, and next task. A documentation review is not a database-verification pass. A skipped service-dependent suite is not a successful module gate.
 
-**Current state:** SETUP-01.1, SETUP-01.2, and SETUP-01.3 are implemented and verified with evidence above. The API is a module harness and the frontend is a static foundation. No financial behavior, schemas, migrations, or containers are implemented yet.
+**Current state:** SETUP-01.1, SETUP-01.2, SETUP-01.3 and SETUP-02 are implemented and verified with evidence above. The API is a module harness, the frontend is a static foundation, and Compose defines two local test services. No financial behavior, schemas, migrations or running containers have been created by this setup work.
 
-**Next action:** Merge the verified Setup 1 harness branch into development, then branch from latest development for authorized SETUP-02. Define and verify the local service configuration only. Stop before SETUP-03; do not start infrastructure, execute migrations, or deploy.
+**Next action:** Stop after the authorized SETUP-02 integration into development. SETUP-03.1 is next in order and remains unauthorized. Do not start infrastructure, execute migrations, or deploy. The task branch and development merge history record integration revisions.

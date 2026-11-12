@@ -125,6 +125,51 @@ warnings for muted/border because those roles are consumed directly in CSS rathe
 than its limited component-token schema. Runtime mappings and screenshots were
 checked; no duplicate or unused runtime colors were introduced to silence the tool.
 
+## Disposable local services (SETUP-02)
+
+`docker-compose.yml` defines configuration only, for a single owned
+`ledgersentinel-test` stack. No service startup or migration has been performed.
+
+| Service | Exact official image and immutable manifest index | Host-only endpoint |
+| --- | --- | --- |
+| PostgreSQL | `postgres:16.15-alpine3.24@sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139` | `127.0.0.1:55432` |
+| Redis | `redis:7.2.17-alpine3.22@sha256:ea0b4a0bac3988a3129908075d6219d78cc7b2a0a4b643b14ce857333026177a` | `127.0.0.1:56379` |
+
+Checked on 2026-11-12 against official Docker Hub tags and registry manifests;
+both indexes include linux/amd64 and linux/arm64. Docker Compose v2.32.4 was used
+for real configuration validation. Registry inspection did not pull image layers.
+
+The fixed database is `ledgersentinel_test`, initialized by `ledger_test`. That
+account is an initialization superuser, not the future restricted application
+runtime role. PostgreSQL data and Redis append-only data have separate project-owned
+`*_test_data` volumes. There are no bind mounts, external volumes, app containers,
+host-network services, restart policies that start services automatically, or
+published non-loopback ports.
+
+`.env.example` contains names with empty values only: POSTGRES_PASSWORD,
+TEST_DATABASE_URL and TEST_REDIS_URL. The latter two are reserved for later harnesses.
+Compose refuses an unset/empty password. Real values stay human-managed; no usable
+credential is committed. Health checks probe process availability with bounded
+intervals/timeouts/retries; they do not prove authenticated SQL or financial invariants.
+
+The tests require the Compose CLI but not its daemon, running services, credentials,
+or network access:
+
+```powershell
+node --test tools/verification/compose.test.mjs
+```
+
+They select `.env.example` explicitly and inject an in-process nonsecret marker for
+configuration expansion. The equivalent standalone validation used during this task
+sets POSTGRES_PASSWORD to that marker and COMPOSE_ENV_FILES to `.env.example`, then
+runs `docker compose config --quiet`. Never use this marker to start services.
+
+Future startup needs explicit environment authorization and a real disposable test
+password. One stack owns the fixed project/volume names; parallel runs require
+distinct owned project namespaces. Do not target a demo/production database, reuse
+another developer's volumes, or reset/delete data automatically. The next database
+harness and all migrations remain separately gated.
+
 References: [Turborepo configuration](https://turborepo.com/docs/reference/configuration),
 [pnpm package metadata](https://pnpm.io/package_json),
 [TypeScript strict checking](https://www.typescriptlang.org/tsconfig/strict.html).
