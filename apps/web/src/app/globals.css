@@ -1,0 +1,61 @@
+* { box-sizing: border-box; }
+
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: var(--muted) var(--background);
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+*::-webkit-scrollbar { width: 0.75rem; height: 0.75rem; }
+*::-webkit-scrollbar-track { background: var(--background); }
+*::-webkit-scrollbar-thumb { background: var(--muted); border: 3px solid var(--background); border-radius: 1rem; }
+*::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+*::-webkit-scrollbar-thumb:active { background: var(--foreground); }
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+.foundation {
+  width: min(calc(100% - 2rem), var(--page-max));
+  margin-inline: auto;
+  padding-block: clamp(3rem, 10vw, 7rem);
+}
+
+.environment {
+  margin: 0 0 2.5rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.identity {
+  border-left: 6px double var(--primary);
+  padding-left: clamp(1rem, 4vw, 2rem);
+  margin-bottom: 3rem;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.35rem, 7.5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+}
+
+.purpose { margin: 0.75rem 0 0; color: var(--muted); font-size: clamp(1rem, 3vw, 1.25rem); }
+h2 { margin: 0 0 0.5rem; font-size: 1.125rem; font-weight: 600; }
+.ui-surface p { margin: 0; color: var(--muted); max-width: 55ch; }
+
+@media (forced-colors: active) {
+  html { scrollbar-color: CanvasText Canvas; }
+  :focus-visible { outline-color: Highlight; }
+}

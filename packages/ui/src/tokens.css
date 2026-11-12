@@ -1,0 +1,24 @@
+:root {
+  color-scheme: light;
+  --background: #eef3f8;
+  --surface: #ffffff;
+  --foreground: #182b3b;
+  --muted: #526575;
+  --primary: #244c73;
+  --border: #aebfce;
+  --focus: var(--primary);
+  --font-body: 'Segoe UI', system-ui, sans-serif;
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-mono: 'Cascadia Code', Consolas, monospace;
+  --radius-surface: 0.75rem;
+  --space-unit: 0.5rem;
+  --page-max: 52rem;
+}
+
+.ui-surface {
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  padding: clamp(1.5rem, 5vw, 3rem);
+}
