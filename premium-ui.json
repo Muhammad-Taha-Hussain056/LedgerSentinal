@@ -1,0 +1,10 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["apps/web/src", "packages/ui/src"],
+  "locale": "en",
+  "canonicalMap": "DESIGN.md",
+  "requiredCapabilities": ["Scrollbar"],
+  "evidence": {
+    "foundation": "tests/e2e/foundation.spec.ts"
+  }
+}

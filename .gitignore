@@ -27,3 +27,7 @@ Thumbs.db
 .idea/
 .vscode/settings.json
 .superpowers/
+.npm-cache/
+.pnpm-cache/
+.pnpm-state/
+next-env.d.ts

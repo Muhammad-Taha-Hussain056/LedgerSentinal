@@ -9,7 +9,26 @@ LedgerSentinel is a local portfolio project demonstrating reliable payment inges
 - [Execution plan](docs/execution.md)
 - [Engineering instructions](CLAUDE.md)
 
-Implementation is pending the approvals recorded in the execution plan.
+Workspace, API compilation/testing, and frontend foundation harnesses are implemented.
+Financial features and infrastructure execution remain pending their owning tasks.
+
+## Local harness checks
+
+Use Node 24.10.x–24.x and pnpm 10.24.0. Install once from this directory with
+`pnpm install`; see [toolchain details](docs/toolchain.md) for exact versions and caches.
+
+```powershell
+node --test tools/verification/workspace.test.mjs
+npm.cmd --prefix apps/api run test -- --runInBand --runTestsByPath test/harness.spec.ts
+pnpm --filter @project/web exec vitest run src/app/page.test.tsx
+pnpm --filter @project/web run build
+```
+
+For a local preview, use `pnpm --filter @project/web run dev --hostname 127.0.0.1`.
+The page is a static preparation screen. The API currently provides a module harness,
+not an HTTP server. To run browser smoke tests after building, use
+`pnpm exec playwright test tests/e2e/foundation.spec.ts` with installed Playwright
+Chromium, or set `PLAYWRIGHT_CHANNEL=chrome` to use an installed Chrome.
 
 ## Git workflow
 
