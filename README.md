@@ -11,7 +11,8 @@ LedgerSentinel is a local portfolio project demonstrating reliable payment inges
 
 Workspace, API compilation/testing, and frontend foundation harnesses are implemented.
 PostgreSQL/Redis test-service configuration is defined and validated. Financial
-features and infrastructure execution remain pending their owning tasks.
+features and infrastructure execution remain pending their owning tasks. The shared
+contracts package provides verified exact-money, pagination and common transport schemas.
 
 ## Local harness checks
 
@@ -21,6 +22,7 @@ Use Node 24.10.x–24.x and pnpm 10.24.0. Install once from this directory with
 ```powershell
 node --test tools/verification/workspace.test.mjs
 node --test tools/verification/compose.test.mjs
+pnpm --filter @project/contracts exec vitest run src/common.test.ts
 npm.cmd --prefix apps/api run test -- --runInBand --runTestsByPath test/harness.spec.ts
 pnpm --filter @project/web exec vitest run src/app/page.test.tsx
 pnpm --filter @project/web run build
