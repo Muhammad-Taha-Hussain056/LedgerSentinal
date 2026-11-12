@@ -170,6 +170,20 @@ distinct owned project namespaces. Do not target a demo/production database, reu
 another developer's volumes, or reset/delete data automatically. The next database
 harness and all migrations remain separately gated.
 
+## Common contracts (SETUP-03.1)
+
+`@project/contracts` uses Zod 4.6.7 as its only runtime dependency and tsup 8.5.0
+for bundled ESM/CJS plus matching `.d.ts`/`.d.cts` outputs. TypeScript 5.9.3,
+Vitest 4.1.12 and the established ESLint tools verify the package. Registry metadata
+was checked: tsup 8.5.0 supports Node >=18; tsup 9 requires a newer patch than this
+machine's Node 24.10.0, so the compatible 8.x release was selected.
+
+Required common tests, package typecheck/build/lint, `.mts`/`.cts` declaration
+consumers, and both real Node export conditions were executed successfully. Export
+tests enforce the public root boundary. No application dependencies or root path
+aliases bypass package exports. API/Next production consumption belongs to SETUP-03.2.
+See [the package contract](../packages/contracts/README.md) for serialization rulings.
+
 References: [Turborepo configuration](https://turborepo.com/docs/reference/configuration),
 [pnpm package metadata](https://pnpm.io/package_json),
 [TypeScript strict checking](https://www.typescriptlang.org/tsconfig/strict.html).

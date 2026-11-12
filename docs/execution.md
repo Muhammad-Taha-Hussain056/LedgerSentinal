@@ -1,12 +1,12 @@
 # LedgerSentinel Implementation Plan
 
-> **For agentic workers:** Use `superpowers:executing-plans` for task-by-task work, or `superpowers:subagent-driven-development` only if selected. Checkboxes and evidence record actual progress. The user explicitly authorized SETUP-01.1 through SETUP-01.3, then SETUP-02, including task branches, commits, merges and pushes to development without further questions. SETUP-02 must start from development after the Setup 1 merge. Stop before SETUP-03.
+> **For agentic workers:** Use `superpowers:executing-plans` for task-by-task work, or `superpowers:subagent-driven-development` only if selected. Checkboxes and evidence record actual progress. The user authorized SETUP-01.1 through SETUP-02 and their development integrations, then authorized the next task (SETUP-03.1) with “go on” on 2026-11-12. Continue the established task-branch/development workflow and stop before SETUP-03.2.
 
 **Goal:** Deliver the local, synthetic-data LedgerSentinel portfolio MVP without expanding its financial or security scope.  
 **Architecture:** One Next.js app consumes allowlisted NestJS HTTP endpoints. A NestJS modular monolith owns PostgreSQL through repositories; Redis/BullMQ delivers work recoverable from a durable PostgreSQL inbox. Financial writes and reconciliation actions preserve exact money, immutable history, and transactional consistency.  
 **Tech stack:** TypeScript, NestJS, PostgreSQL, Drizzle, Redis/BullMQ, Next.js, shared Zod contracts, shadcn UI, TanStack Query, React Hook Form, Jest, Vitest, and Playwright.  
 **Spec:** [product.md](product.md) and [architecture.md](architecture.md). Read both before executing any task.  
-**Status:** SETUP-01.1 through SETUP-01.3 and SETUP-02 implemented and verified. Evidence updated 2026-11-12. Stop before SETUP-03. Infrastructure startup, migration execution, and deployment remain unapproved; product/schema approval is not inferred from these harness/configuration tasks.
+**Status:** SETUP-01.1 through SETUP-03.1 implemented and verified. Evidence updated 2026-11-12. Stop before SETUP-03.2. Infrastructure startup, migration execution, and deployment remain unapproved; product/schema approval is not inferred from these common-contract tasks.
 
 ## 1. Baseline, corrections, and execution gates
 
@@ -140,10 +140,12 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 - **Limits:** This is configuration verification, not database/queue runtime readiness. The initialization account is a disposable test superuser; later runtime access requires a separate restricted role. Fixed project names identify one owned test stack; concurrent disposable runs need separately owned project namespaces in their future harness. Never delete/reset shared resources automatically.
 
 ### SETUP-03.1 — Publish exact-money and common transport contracts
-- [ ] **Goal / dependency:** SETUP-01.1; establish serialization and public contract exports.
+- [x] **Goal / dependency:** SETUP-01.1; establish serialization and public contract exports.
 - **Files:** `packages/contracts/package.json`, `tsconfig.json`, `src/money.ts`, `pagination.ts`, `problem.ts`, `index.ts`, `src/common.test.ts`.
 - **Deliverable:** Money strings reject exponents, extra decimals, nonfinite and out-of-range values; canonical output has two decimals. Pagination defaults 1/20, maximum limit 100; RFC-9457 extensions and success/list metadata. Explicit package exports work in both API and Next production builds.
 - **Verification:** `pnpm --filter @project/contracts exec vitest run src/common.test.ts` — boundary-value cases pass; also `pnpm --filter @project/contracts run typecheck`.
+- **Evidence (2026-11-12):** Branch `chore/setup-03-1-common-contracts` from latest development `1b6d5d9`. Root pnpm install exited 0 and generated the lockfile change. Initial RED failed on the absent public index; GREEN passed 73 common-contract tests. Typecheck, ESLint and tsup dual ESM/CJS/declaration build exited 0. `pnpm --filter @project/contracts run verify:exports` compiled real .mts/.cts consumers and passed 3 Node export tests, including private-subpath rejection. Bounded review identified oversized/inconsistent list acceptance; three explicit regression cases failed before the fix and the whole suite passed afterward. Runtime dependencies are Zod only. No API/web dependencies, endpoint/domain schemas, persistence, migrations or infrastructure were changed.
+- **Contract rulings:** Leading-zero input normalizes rather than introducing an extra financial rejection rule; negative zero serializes as 0.00. Common money is signed/zero-capable; positive/nonzero domain rules remain SETUP-03.2. Pagination fields live in meta, empty results have pages 0, and list length cannot exceed limit/total. Field errors use path/code/message with an empty path allowed for root errors. Correlation IDs are safe 1–128-character tokens; problem schemas permit the named project extensions, not arbitrary diagnostics. See packages/contracts/README.md. The package stays private/workspace-based despite the toolkit's separate-repository publication example. Actual API/Next consumer builds remain SETUP-03.2.
 
 ### SETUP-03.2 — Publish the domain transport contracts
 - [ ] **Goal / dependency:** SETUP-03.1; serialize architecture §7.1 without ORM leakage.
@@ -536,6 +538,6 @@ The inbox prerequisite does not move M2's security/queue behavior ahead of M1. L
 
 Completing a task requires naming the actual files/revision, command, observed exit/result, relevant limitations, and next task. A documentation review is not a database-verification pass. A skipped service-dependent suite is not a successful module gate.
 
-**Current state:** SETUP-01.1, SETUP-01.2, SETUP-01.3 and SETUP-02 are implemented and verified with evidence above. The API is a module harness, the frontend is a static foundation, and Compose defines two local test services. No financial behavior, schemas, migrations or running containers have been created by this setup work.
+**Current state:** SETUP-01.1 through SETUP-03.1 are implemented and verified. The API is a module harness, the frontend is a static foundation, Compose defines two local test services, and the shared package exports common serialization/transport schemas. No financial application behavior, database schemas, migrations or running containers have been created by this setup work.
 
-**Next action:** Stop after the authorized SETUP-02 integration into development. SETUP-03.1 is next in order and remains unauthorized. Do not start infrastructure, execute migrations, or deploy. The task branch and development merge history record integration revisions.
+**Next action:** Stop after SETUP-03.1 integration into development. SETUP-03.2 is next in order and remains unauthorized. Do not start infrastructure, execute migrations, or deploy. Task branch and development merge history record integration revisions.
